@@ -48,24 +48,61 @@
 #errs.myfunc()
 #--------------------------
 
-class Sebastian:
-    def __init__(self, tobe, people):
-        self.tobe = tobe
-        self.people = people
+#class Sebastian:
+#    def __init__(self, tobe, people):
+#        self.tobe = tobe
+#        self.people = people
 
-    def tellme(self):
-        print("call me {}".format(self.people))
+#    def tellme(self):
+#        print("call me {}".format(self.people))
 
-    def __str__(self):
-        return f"{self.tobe} is {self.people}"
+#    def __str__(self):
+#        return f"{self.tobe} is {self.people}"
 
-    def calculate(self, x, y):
-        return x + y + self.people
-
-
-selestian = Sebastian("james", 34)
-selestian.tellme()
-print(selestian)
-print(selestian.calculate(2,3))
+#    def calculate(self, x, y):
+#        return x + y + self.people
 
 
+#selestian = Sebastian("james", 34)
+#selestian.tellme()
+#print(selestian)
+#print(selestian.calculate(2,3))
+
+#--------------------------------------------------   Linear regression here.
+
+import tensorflow as tf
+print(tf.__version__) # check the version (should be 2.x+)
+
+import datetime
+print(f"Notebook last run (end-to-end): {datetime.datetime.now()}")
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Create features (using tensors)
+X = tf.constant([-7.0, -4.0, -1.0, 2.0, 5.0, 8.0, 11.0, 14.0])
+
+# Create labels (using tensors)
+y = tf.constant([3.0, 6.0, 9.0, 12.0, 15.0, 18.0, 21.0, 24.0])
+
+# Visualize it
+plt.scatter(X, y)
+
+# Set random seed
+
+# Create a model using the Sequential API
+# Set random seed
+tf.random.set_seed(42)
+
+# Create a model (same as above)
+model = tf.keras.Sequential([
+  tf.keras.layers.Dense(1)
+])
+
+# Compile model (same as above)
+model.compile(loss=tf.keras.losses.mae,
+              optimizer=tf.keras.optimizers.legacy.SGD(),
+              metrics=["mae"])
+
+# Fit model (this time we'll train for longer)
+model.fit(tf.expand_dims(X, axis=-1), y, epochs=100) # train for 100 epochs not 10
