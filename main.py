@@ -70,39 +70,85 @@
 
 #--------------------------------------------------   Linear regression here.
 
-import tensorflow as tf
-print(tf.__version__) # check the version (should be 2.x+)
+#import tensorflow as tf
+#print(tf.__version__) # check the version (should be 2.x+)
 
-import datetime
-print(f"Notebook last run (end-to-end): {datetime.datetime.now()}")
+#import datetime
+#print(f"Notebook last run (end-to-end): {datetime.datetime.now()}")
 
-import numpy as np
-import matplotlib.pyplot as plt
+#import numpy as np
+#import matplotlib.pyplot as plt
 
 # Create features (using tensors)
-X = tf.constant([-7.0, -4.0, -1.0, 2.0, 5.0, 8.0, 11.0, 14.0])
+#X = tf.constant([-7.0, -4.0, -1.0, 2.0, 5.0, 8.0, 11.0, 14.0])
 
 # Create labels (using tensors)
-y = tf.constant([3.0, 6.0, 9.0, 12.0, 15.0, 18.0, 21.0, 24.0])
+#y = tf.constant([3.0, 6.0, 9.0, 12.0, 15.0, 18.0, 21.0, 24.0])
 
 # Visualize it
-plt.scatter(X, y)
+#plt.scatter(X, y)
 
 # Set random seed
 
 # Create a model using the Sequential API
 # Set random seed
-tf.random.set_seed(42)
+#tf.random.set_seed(42)
 
 # Create a model (same as above)
-model = tf.keras.Sequential([
-  tf.keras.layers.Dense(1)
-])
+#model = tf.keras.Sequential([
+#  tf.keras.layers.Dense(1)
+#])
 
 # Compile model (same as above)
-model.compile(loss=tf.keras.losses.mae,
-              optimizer=tf.keras.optimizers.legacy.SGD(),
-              metrics=["mae"])
+#model.compile(loss=tf.keras.losses.mae,
+#              optimizer=tf.keras.optimizers.legacy.SGD(),
+#              metrics=["mae"])
 
 # Fit model (this time we'll train for longer)
-model.fit(tf.expand_dims(X, axis=-1), y, epochs=100) # train for 100 epochs not 10
+#model.fit(tf.expand_dims(X, axis=-1), y, epochs=100) # train for 100 epochs not 10
+
+#--------------------------------------------------------------------------------------------------------------------Numpy 📌
+#import numpy as np
+
+#values = np.array([1,2,3,4,5]) # this is a 1d array
+#print(values)
+#print(np.__version__)
+#print(type(values))
+#1️⃣
+
+#va = np.array((1,2,3,4,5)) # tupple
+#print(va)
+
+#2️⃣ array
+#twod = np.array([[1,2,3,4,5], [6,7,8,9,10]])
+#print(twod)
+#print(twod.shape)
+#print(twod.ndim) # checking dimensions.
+
+#fivedmen = np.array([1, 2, 3, 4], ndmin=5)
+#print(fivedmen)
+
+
+import numpy as np
+#arr = np.array([1,2,3,4,5,6,7,8,9,10,11,12])
+#print(arr.reshape(4,3))
+#x = arr.reshape(4,3)
+#print(x.reshape(-1))
+#x = arr.view()
+#y = arr.copy()
+
+#x[3] = 900
+#print(arr)
+#print(x.base)
+#print(y.base)
+
+
+#arr1 = np.array([1, 2, 3])
+#arr2 = np.array([4, 5, 6])
+#arr = np.vstack((arr1, arr2))
+#print(arr)
+
+#arr1 = np.array([1, 2, 3])
+#arr2 = np.array([4, 5, 6])
+#arr = np.vstack((arr1, arr2))
+#print(arr)
