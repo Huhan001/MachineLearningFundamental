@@ -25,6 +25,9 @@ def checkyourself():
     # 📌( train the model )
     model.fit(x, y)
 
+    x_new = [[37_655.2]]
+    print(model.predict(x_new))
+
 
 if __name__ == "__main__":
     checkyourself()
