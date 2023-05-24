@@ -108,6 +108,61 @@ def chaprterTwo():
     from sklearn.model_selection import train_test_split
     train_set, test_set = train_test_split(housing, test_size= 0.2, random_state= 42)
 
+    # stratified sampling
+    housing["income_cat"] = pd.cut(housing["median_income"],
+                                   bins= [0., 1.5, 3.0, 4.5, 6., np.inf],
+                                   labels = [1, 2, 3, 4, 5])
+    # lets plot this
+    #housing["income_cat"].value_counts().sort_index().plot(kind = "bar")
+    #plt.xlabel("income category")
+    #plt.ylabel("count")
+    #plt.show()
+
+    #print(housing["income_cat"].value_counts() / len(housing)) #percentage of each category.
+
+    from sklearn.model_selection import StratifiedShuffleSplit
+    splitter = StratifiedShuffleSplit(n_splits= 10, test_size= 0.2, random_state= 42)
+    strat_splits = []
+    for train_index, test_index in splitter.split(housing, housing["income_cat"]):
+        strat_train_set_n = housing.iloc[train_index]
+        strat_test_set_n = housing.iloc[test_index]
+        strat_splits.append([strat_train_set_n, strat_test_set_n])
+
+    #now lets use the first split.
+    #strat_train_set, strat_test_set = strat_splits[0]
+    # there is however a much shorter way to get stratified data with scipy
+
+    strat_train_set, strat_test_set = train_test_split(housing, test_size= 0.2,
+                                                       random_state = 42,
+                                                       stratify = housing["income_cat"])
+
+    # after the stratfied. we wont use the income again so we shall drop it.
+    for set_ in (strat_train_set, strat_test_set):
+        set_.drop(columns = "income_cat", axis = 1, inplace = True)
+
+    # visualizeing the data
+    housing_data = strat_train_set.copy() # we copy to avoid mishandlind the data.
+    housing_data.plot(kind = "scatter", x = "longitude", y = "latitude", alpha = 0.2,
+                      grid = True)
+    #plt.show()
+
+    # we can do better with the visualizarion, by adding color
+    housing_data.plot(kind = "scatter", x = "longitude", y = "latitude",
+                      s = housing_data["population"] / 100, label = "population",
+                      c = "median_house_value", cmap = "jet", colorbar = True,
+                      legend = True, sharex = False, figsize = (12, 8))
+    plt.show()
+
+    # since the data is not too large, we can compute the corelation matrix
+    # to see how well corelated they are to the house prices.
+    corr_matrix = housing_data.drop(columns = "ocean_proximity").corr()
+    print(corr_matrix["median_house_value"].sort_values(ascending=False))
+
+    #creating new attributes
+    housing_data["roomms_per_house"] = housing_data["total_rooms"] / housing_data["households"]
+    housing_data["bedrooms_ratio"] = housing_data["total_bedrooms"] / housing_data["total_rooms"]
+    housing_data["people_per_house"] = housing_data["population"] / housing_data["households"]
+    print(housing_data.drop(columns = "ocean_proximity").corr()["median_house_value"].sort_values())
 
 
 if __name__ == "__main__":
