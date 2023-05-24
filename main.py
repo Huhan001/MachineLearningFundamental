@@ -166,7 +166,7 @@ def chaprterTwo():
 
     # fetch the data now preparing for machine learning
     houses_train = housing_data.drop(columns = "median_house_value", axis = 1)
-    houses_lebals = housing_data["median_house_value"].copy()
+    houses_labels = housing_data["median_house_value"].copy()
 
     # Get rid of the corresponding districts. 1
     # Get rid of the whole attribute. 2
@@ -203,6 +203,30 @@ def chaprterTwo():
     cat_onehot = OneHotEncoder()
     housing_onehot = cat_onehot.fit_transform(housing_cat)
     #print(housing_onehot.toarray())
+
+    # Feature Scaling
+    # we can use the min-max scaler or the standard scaler.
+    from sklearn.preprocessing import MinMaxScaler
+    min_max_scaler = MinMaxScaler(feature_range=(-1, 1))
+    housing_min_maxed = min_max_scaler.fit_transform(x)
+
+    from sklearn.preprocessing import StandardScaler
+    standard_scaler = StandardScaler()
+    housing_standard = standard_scaler.fit_transform(x)
+
+    # Transformation
+    from sklearn.linear_model import LinearRegression
+    from sklearn.compose import TransformedTargetRegressor
+
+    newfictionaldata = housing_data[["median_income"]].iloc[:5]
+
+    model = TransformedTargetRegressor(LinearRegression(),
+                                       transformer=StandardScaler())
+    model.fit(housing_data[["median_income"]], houses_labels)
+    prediction = model.predict(newfictionaldata)
+    print(prediction)
+
+
 
 
 
