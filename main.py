@@ -151,18 +151,67 @@ def chaprterTwo():
                       s = housing_data["population"] / 100, label = "population",
                       c = "median_house_value", cmap = "jet", colorbar = True,
                       legend = True, sharex = False, figsize = (12, 8))
-    plt.show()
+    #plt.show()
 
     # since the data is not too large, we can compute the corelation matrix
     # to see how well corelated they are to the house prices.
     corr_matrix = housing_data.drop(columns = "ocean_proximity").corr()
-    print(corr_matrix["median_house_value"].sort_values(ascending=False))
+    #print(corr_matrix["median_house_value"].sort_values(ascending=False))
 
     #creating new attributes
-    housing_data["roomms_per_house"] = housing_data["total_rooms"] / housing_data["households"]
+    housing_data["rooms_per_house"] = housing_data["total_rooms"] / housing_data["households"]
     housing_data["bedrooms_ratio"] = housing_data["total_bedrooms"] / housing_data["total_rooms"]
     housing_data["people_per_house"] = housing_data["population"] / housing_data["households"]
-    print(housing_data.drop(columns = "ocean_proximity").corr()["median_house_value"].sort_values())
+    #print(housing_data.drop(columns = "ocean_proximity").corr()["median_house_value"].sort_values())
+
+    # fetch the data now preparing for machine learning
+    houses_train = housing_data.drop(columns = "median_house_value", axis = 1)
+    houses_lebals = housing_data["median_house_value"].copy()
+
+    # Get rid of the corresponding districts. 1
+    # Get rid of the whole attribute. 2
+    # Set the missing values to some value (zero, the mean, the median, etc.). This is called imputation.
+
+    #print(houses_train["ocean_proximity"].value_counts())
+    houses_train.dropna(subset =["total_bedrooms"]) # option 1 🅧
+    houses_train.drop("total_bedrooms", axis = 1) # option 2
+    median = houses_train["total_bedrooms"].median()
+    houses_train["total_bedrooms"].fillna(median) # options 3
+
+    # you can employ the simple imputer by sklearn.✨
+
+    from sklearn.impute import SimpleImputer
+    imputer = SimpleImputer(strategy = "median")
+
+    # to use it, create a copy of all numerical attributes.
+    housing_num = houses_train.select_dtypes(include = [np.number])
+    imputer.fit(housing_num)
+    x = imputer.transform(housing_num)
+
+    #when trying to recover x.
+    #housing_tr = pd.DataFrame(x, columns = housing_num.columns,index= housing_num.index)
+    #print(housing_tr.head(5))
+
+    # handling text and categorical attributes
+    # we can use the ordinal encoder to encode the text to numbers.
+    from sklearn.preprocessing import OrdinalEncoder
+    ordinal_encoder = OrdinalEncoder()
+    housing_cat = houses_train[["ocean_proximity"]]
+    #houses_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
+
+    from sklearn.preprocessing import OneHotEncoder
+    cat_onehot = OneHotEncoder()
+    housing_onehot = cat_onehot.fit_transform(housing_cat)
+    #print(housing_onehot.toarray())
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
