@@ -224,8 +224,69 @@ def chaprterTwo():
                                        transformer=StandardScaler())
     model.fit(housing_data[["median_income"]], houses_labels)
     prediction = model.predict(newfictionaldata)
-    print(prediction)
 
+    # custom tranformer, your own function tranformer
+    from sklearn.preprocessing import FunctionTransformer
+    log_tranformer = FunctionTransformer(np.log, inverse_func=np.exp)
+    log_pop = log_tranformer.transform(housing_data[["population"]])
+
+    # custome tranformer with base estimator
+    from sklearn.base import BaseEstimator, TransformerMixin
+    from sklearn.utils.validation import check_is_fitted
+
+    class standardScalerClone(BaseEstimator, TransformerMixin):
+        def __init__(self, with_mean = True):
+            self.with_mean = with_mean
+
+        def fit(self,X, y = None):
+            X = check_array(X)
+            self.mean_ = np.mean(X, axis = 0)
+            self.scale_ = np.std(X, axis = 0)
+            self.n_features_in_ = X.shape[1]
+            return self
+
+        def transform(self, X):
+            check_is_fitted(self)
+            X = check_array(X)
+            assert self.n_features_in_ == X.shape[1]
+            if self.with_mean:
+                X -= self.mean_
+            X /= self.scale_
+            return X
+
+    # pipeline
+
+    from sklearn.pipeline import Pipeline # fi you want to name the transformers.
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.impute import SimpleImputer
+
+    num_pipeline = Pipeline([("impute", SimpleImputer(strategy = "median")),
+                             ("standardize", StandardScaler())])
+
+
+    # if you do not want to name the transfomers
+    from sklearn.pipeline import make_pipeline
+    new_num_pipeline = make_pipeline(SimpleImputer(strategy = "median"),
+                                     StandardScaler())
+
+    # understanding pipelines
+    housing_num_prepared = new_num_pipeline.fit_transform(housing_num)
+    #print(housing_num_prepared[:5])
+
+    #if i wanted to recover the names i would use
+    df_housing_num_prepared = pd.DataFrame(housing_num_prepared,
+                                           columns = new_num_pipeline.get_feature_names_out())
+    print(df_housing_num_prepared)
+
+    # combining the numerical and categorical pipelines
+    from sklearn.compose import ColumnTransformer
+    num_attribs = list(housing_num)
+    cat_attribs = ["ocean_proximity"]
+
+    cat_pipeline = make_pipeline(SimpleImputer(strategy = "most_frequent"),
+                                 OneHotEncoder(handle_unknown="ignore"))
+    prerprocessing = ColumnTransformer([("num", new_num_pipeline, num_attribs),
+                                        "cat", cat_pipeline, cat_attribs])
 
 
 
