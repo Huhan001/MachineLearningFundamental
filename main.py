@@ -338,10 +338,53 @@ def chaprterTwo():
     )
 
     housing_prepared = Ppreprocessing.fit_transform(houses_train)
-    print(housing_prepared.shape)
-    print(pd.DataFrame(housing_prepared, columns= Ppreprocessing.get_feature_names_out(),index= houses_train.index))
+    #print(housing_prepared.shape)
+    #print(pd.DataFrame(housing_prepared, columns= Ppreprocessing.get_feature_names_out(),index= houses_train.index))
 
     # thats how you create a pipeline. for cleaning the data.
+
+    # after the cleaning, now our data will be smooth sailing for the machine learning
+    # algorithms.
+
+    from sklearn.linear_model import LinearRegression
+    lin_reg = make_pipeline(Ppreprocessing, LinearRegression())
+    lin_reg.fit(houses_train, houses_labels)
+    linear_housing_predictions = lin_reg.predict(houses_train)
+   # print(linear_housing_predictions[:5].round(-2))# -2 rounds to the nearest 100
+   # print(houses_labels[:5].values)
+
+    # for comparison sake to see how it fairs with the rest of the tests.
+    # get the measurements via mean_squared_error.
+    from sklearn.metrics import mean_squared_error
+
+    lin_rsme = mean_squared_error(houses_labels, linear_housing_predictions, squared=False)
+    print(lin_rsme)
+    # the figure is 68893.4044
+    # prediction error of $68,893.40 is not satisfying. with median house values ranging
+    # from $120,000 to $265,000, this is not a good model.
+
+    #lets use aq better model, the decision tree regressor.
+    from sklearn.tree import DecisionTreeRegressor
+    tree_reg = make_pipeline(Ppreprocessing, DecisionTreeRegressor(random_state=42))
+    tree_reg.fit(houses_train, houses_labels)
+    tree_housing_predictions = tree_reg.predict(houses_train)
+    tree_rsme = mean_squared_error(houses_labels, tree_housing_predictions, squared=False)
+    print(tree_rsme)
+
+    # Better Evaluation Using Cross-Validation
+    from sklearn.model_selection import cross_val_score
+    # using tree reg from pipeline.
+    tree_rsmes = -cross_val_score(tree_reg, houses_train, houses_labels,
+                                  scoring="neg_root_mean_squared_error", cv=10)
+    # the scoring is very important here
+    print(pd.Series(tree_rsmes).describe())
+
+
+    # let use the random forest regressor
+    from sklearn.ensemble import RandomForestRegressor
+    forest_reg = make_pipeline(Ppreprocessing, RandomForestRegressor(random_state=42))
+    forest_rsmes = -cross_val_score(forest_reg, houses_train, houses_labels,
+                                    scoring="neg_root_mean_squared_error", cv=10)
 
 
 
