@@ -276,7 +276,7 @@ def chaprterTwo():
     #if i wanted to recover the names i would use
     df_housing_num_prepared = pd.DataFrame(housing_num_prepared,
                                            columns = new_num_pipeline.get_feature_names_out())
-    print(df_housing_num_prepared)
+    #print(df_housing_num_prepared)
 
     # combining the numerical and categorical pipelines
     from sklearn.compose import ColumnTransformer
@@ -285,9 +285,63 @@ def chaprterTwo():
 
     cat_pipeline = make_pipeline(SimpleImputer(strategy = "most_frequent"),
                                  OneHotEncoder(handle_unknown="ignore"))
-    prerprocessing = ColumnTransformer([("num", new_num_pipeline, num_attribs),
+    porerprocessing = ColumnTransformer([("num", new_num_pipeline, num_attribs),
                                         "cat", cat_pipeline, cat_attribs])
 
+    # use a different one without naming.
+
+    from sklearn.compose import make_column_transformer, make_column_selector
+    preprocessing = make_column_transformer(
+        (new_num_pipeline, make_column_selector(dtype_include=np.number)),
+        (cat_pipeline, make_column_selector(dtype_include=object))
+    )
+
+    housing_prepared =  preprocessing.fit_transform(houses_train)
+    pd.DataFrame(housing_prepared, columns= preprocessing.get_feature_names_out(),
+                       index= houses_train.index)
+    # need to make sure you are sizing up the indexes just right.
+
+    def column_ratio(X):
+        return X[:, [0]] / X[:, [1]]
+
+    def ratio_name(function_transformer, feature_names_in):
+        return ["ratio"]
+
+    def ratio_pipeline():
+        return make_pipeline(
+            SimpleImputer(strategy = "median"),
+            FunctionTransformer(column_ratio, feature_names_out=ratio_name),
+            StandardScaler()
+        )
+
+    log_pipeline = make_pipeline(
+        SimpleImputer(strategy = "median"),
+        FunctionTransformer(np.log, feature_names_out= "one-to-one"),
+        StandardScaler()
+    )
+
+    default_num_pipeline = make_pipeline(
+        SimpleImputer(strategy = "median"),
+        StandardScaler()
+    )
+
+    # the main processor connector.
+
+    Ppreprocessing = make_column_transformer(
+        (ratio_pipeline(), ["total_rooms", "total_bedrooms"]),
+        (ratio_pipeline(), ["total_rooms", "households"]),
+        (ratio_pipeline(), ["population", "households"]),
+        (log_pipeline, ["population", "households",
+                        "total_bedrooms","total_rooms", "median_income",]),
+        (cat_pipeline, make_column_selector(dtype_include=object)),
+        remainder= default_num_pipeline # for remaining columns
+    )
+
+    housing_prepared = Ppreprocessing.fit_transform(houses_train)
+    print(housing_prepared.shape)
+    print(pd.DataFrame(housing_prepared, columns= Ppreprocessing.get_feature_names_out(),index= houses_train.index))
+
+    # thats how you create a pipeline. for cleaning the data.
 
 
 
