@@ -358,7 +358,7 @@ def chaprterTwo():
     from sklearn.metrics import mean_squared_error
 
     lin_rsme = mean_squared_error(houses_labels, linear_housing_predictions, squared=False)
-    print(lin_rsme)
+    #print(lin_rsme)
     # the figure is 68893.4044
     # prediction error of $68,893.40 is not satisfying. with median house values ranging
     # from $120,000 to $265,000, this is not a good model.
@@ -369,7 +369,7 @@ def chaprterTwo():
     tree_reg.fit(houses_train, houses_labels)
     tree_housing_predictions = tree_reg.predict(houses_train)
     tree_rsme = mean_squared_error(houses_labels, tree_housing_predictions, squared=False)
-    print(tree_rsme)
+    #print(tree_rsme)
 
     # Better Evaluation Using Cross-Validation
     from sklearn.model_selection import cross_val_score
@@ -377,7 +377,7 @@ def chaprterTwo():
     tree_rsmes = -cross_val_score(tree_reg, houses_train, houses_labels,
                                   scoring="neg_root_mean_squared_error", cv=10)
     # the scoring is very important here
-    print(pd.Series(tree_rsmes).describe())
+    #print(pd.Series(tree_rsmes).describe())
 
 
     # let use the random forest regressor
@@ -388,9 +388,34 @@ def chaprterTwo():
 
 
 
+    from sklearn.model_selection import GridSearchCV
+    full_pipeline = Pipeline([
+        ("preprocessing", Ppreprocessing),
+        ("regressor", RandomForestRegressor(random_state=42))
+    ])
 
+    param_grid = [
+        {"preprocessing_geo_n_clusters": [5, 8, 10],
+         "random_forest__max_features": [2, 4, 6, 8]},
+        {"preprocessing_geo_n_clusters": [10, 15],
+            "random_forest__bootstrap": [6, 8, 10]}
+    ]
 
+    grid_search = GridSearchCV(full_pipeline, param_grid, cv=5,
+                                 scoring="neg_root_mean_squared_error")
+    grid_search.fit(houses_train, houses_labels)
+    print(grid_search.best_params_)
 
+    from sklearn.model_selection import RandomizedSearchCV
+    from scipy.stats import randint
+
+    param_distribs = {"preprocessing_geo_n_clusters": randint(low=5, high=10),
+                      "random_forest__max_features": randint(low=2, high=8)}
+    rnd_search = RandomizedSearchCV(full_pipeline, param_distributions=param_distribs,
+                                    n_iter=10, cv=5, scoring="neg_root_mean_squared_error",
+                                    random_state=42)
+    rnd_search.fit(houses_train, houses_labels)
+    print(rnd_search.best_params_)
 
 
 
