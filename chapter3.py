@@ -48,8 +48,16 @@ def classiSDG():
     scaler = StandardScaler()
 
     X_train_scaled = scaler.fit_transform(X_train.astype(np.float64)) # this is a float64 because the scaler requires it
-    y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=3)
+    # y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=2)
+    # trying to save time
 
+    sgd_clf.fit(X_train_scaled, y_train)
+    y_train_pred = sgd_clf.predict(X_train_scaled)
+
+    from sklearn.metrics import ConfusionMatrixDisplay
+
+    ConfusionMatrixDisplay.from_predictions(y_train, y_train_pred)
+    plt.show()
 
     # confusion matrix
     from sklearn.metrics import confusion_matrix
@@ -99,10 +107,6 @@ def classiSDG():
     #confusion matrix
     #precision/recall tradeoff
 
-    from sklearn.metrics import ConfusionMatrixDisplay
-
-    ConfusionMatrixDisplay(y_train, y_train_pred)
-    plt.show()
 
 
 
