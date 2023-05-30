@@ -21,8 +21,8 @@ def classiSDG():
     y_train, y_test = y[:60000], y[60000:]
 
     # training a binary clasifier
-    y_train_5 = (y_train == '5')
-    y_test_5 = (y_test == '5')
+    #y_train_5 = (y_train == '5')
+    #y_test_5 = (y_test == '5')
 
     # an SDG is better because it trains each data set indivisually
     # and is better for large data sets
@@ -48,15 +48,16 @@ def classiSDG():
     scaler = StandardScaler()
 
     X_train_scaled = scaler.fit_transform(X_train.astype(np.float64)) # this is a float64 because the scaler requires it
-    # y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=2)
+    y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=3)
     # trying to save time
 
-    sgd_clf.fit(X_train_scaled, y_train)
-    y_train_pred = sgd_clf.predict(X_train_scaled)
+    savetime = y_train_pred.copy()
 
     from sklearn.metrics import ConfusionMatrixDisplay
 
-    ConfusionMatrixDisplay.from_predictions(y_train, y_train_pred)
+    sample_weight = (y_train_pred != y_train)
+    ConfusionMatrixDisplay.from_predictions(y_train, savetime, normalize='true',
+                                            values_format=".0%")
     plt.show()
 
     # confusion matrix
