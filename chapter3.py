@@ -28,7 +28,7 @@ def classiSDG():
     # and is better for large data sets
 
     from sklearn.linear_model import SGDClassifier
-    sgd_clf = SGDClassifier(random_state=42)
+    #sgd_clf = SGDClassifier(random_state=42)
     #sgd_clf.fit(X_train, y_train_5)
 
     #print(sgd_clf.predict([X[0]])) # the image 5 is at index 0
@@ -43,22 +43,22 @@ def classiSDG():
     import numpy as np
     import matplotlib.pyplot as plt
     import pandas as pd
-    from sklearn.model_selection import cross_val_predict
-    from sklearn.preprocessing import StandardScaler
-    scaler = StandardScaler()
+    #from sklearn.model_selection import cross_val_predict
+    #from sklearn.preprocessing import StandardScaler
+    #scaler = StandardScaler()
 
-    X_train_scaled = scaler.fit_transform(X_train.astype(np.float64)) # this is a float64 because the scaler requires it
-    y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=3)
+   # X_train_scaled = scaler.fit_transform(X_train.astype(np.float64)) # this is a float64 because the scaler requires it
+   # y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=3)
     # trying to save time
 
-    savetime = y_train_pred.copy()
+    #savetime = y_train_pred.copy()
 
-    from sklearn.metrics import ConfusionMatrixDisplay
+    #from sklearn.metrics import ConfusionMatrixDisplay
 
-    sample_weight = (y_train_pred != y_train)
-    ConfusionMatrixDisplay.from_predictions(y_train, savetime, normalize='true',
-                                            values_format=".0%")
-    plt.show()
+   # sample_weight = (y_train_pred != y_train)
+   # ConfusionMatrixDisplay.from_predictions(y_train, savetime, normalize='true',
+    #                                        values_format=".0%")
+    #plt.show()
 
     # confusion matrix
     from sklearn.metrics import confusion_matrix
@@ -107,6 +107,28 @@ def classiSDG():
     #Error AnLysis
     #confusion matrix
     #precision/recall tradeoff
+
+    np.random.seed(42)
+    noise = np.random.randint(0, 100, (len(X_train), 784))
+    X_train_mod = X_train + noise
+    noise = np.random.randint(0, 100, (len(X_test), 784))
+    X_test_mod = X_test + noise
+
+    y_train_mod = X_train
+    y_test_mod = X_test
+
+    from sklearn.neighbors import KNeighborsClassifier
+    knn_clf = KNeighborsClassifier()
+    knn_clf.fit(X_train_mod, y_train_mod)
+    clean_digit = knn_clf.predict([X_test_mod[0]])
+
+    def plot_digit(image_data):
+        image = image_data.reshape(28, 28)
+        plt.imshow(image, cmap="binary")
+        plt.axis("off")
+        plt.show()
+
+    plot_digit(clean_digit)
 
 
 
