@@ -1,6 +1,6 @@
-from bigquery import *
+from chapter3 import *
 def runquery():
-    query()
+    classiSDG()
 
 if __name__ == "__main__":
     runquery()

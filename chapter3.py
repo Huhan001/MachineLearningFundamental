@@ -108,27 +108,59 @@ def classiSDG():
     #confusion matrix
     #precision/recall tradeoff
 
-    np.random.seed(42)
-    noise = np.random.randint(0, 100, (len(X_train), 784))
-    X_train_mod = X_train + noise
-    noise = np.random.randint(0, 100, (len(X_test), 784))
-    X_test_mod = X_test + noise
+    #np.random.seed(42)
+    #noise = np.random.randint(0, 100, (len(X_train), 784))
+    #X_train_mod = X_train + noise
+    #noise = np.random.randint(0, 100, (len(X_test), 784))
+    #X_test_mod = X_test + noise
 
-    y_train_mod = X_train
-    y_test_mod = X_test
+    #y_train_mod = X_train
+    #y_test_mod = X_test
 
-    from sklearn.neighbors import KNeighborsClassifier
-    knn_clf = KNeighborsClassifier()
-    knn_clf.fit(X_train_mod, y_train_mod)
-    clean_digit = knn_clf.predict([X_test_mod[0]])
+    #from sklearn.neighbors import KNeighborsClassifier
+    #knn_clf = KNeighborsClassifier()
+    #knn_clf.fit(X_train_mod, y_train_mod)
+    #clean_digit = knn_clf.predict([X_test_mod[0]])
 
-    def plot_digit(image_data):
-        image = image_data.reshape(28, 28)
-        plt.imshow(image, cmap="binary")
-        plt.axis("off")
-        plt.show()
+    #def plot_digit(image_data):
+    #    image = image_data.reshape(28, 28)
+    #    plt.imshow(image, cmap="binary")
+    #    plt.axis("off")
+    #    plt.show()
 
-    plot_digit(clean_digit)
+    #plot_digit(clean_digit)
+
+    from copy import deepcopy
+    from sklearn.linear_model import SGDRegressor
+    from sklearn.metrics import mean_squared_error
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import PolynomialFeatures
+
+    preprocess = make_pipeline(PolynomialFeatures(degree = 2, include_bias=False),
+                               StandardScaler())
+    x_train_prep = preprocess.fit_transform(X_train)
+    x_val_prep = preprocess.transform(X_test)
+    sqd_reg = SGDRegressor(penalty=None, eta0=0.002, random_state=42)
+    n_epochs = 500
+    best_validation_error = float("inf")
+
+    for epoch in range(n_epochs):
+        sqd_reg.partial_fit(x_train_prep, y_train)
+        y_val_predict = sqd_reg.predict(x_val_prep)
+        val_error = mean_squared_error(y_test, y_val_predict, squared=False)
+        if val_error < best_validation_error:
+            best_validation_error = val_error
+            best_epoch = epoch
+            best_model = deepcopy(sqd_reg)
+            print(f"best validation error: {best_validation_error} at epoch: {best_epoch} /n best model: {best_model})")
+
+
+
+
+
+
+
 
 
 
