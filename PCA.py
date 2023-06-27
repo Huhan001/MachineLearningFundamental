@@ -62,7 +62,17 @@ def PrincipleComponentAnalysis():
 
         # Create the animation
     rotation_animation = animation.FuncAnimation(fig, update_rotation, frames=360, fargs=(ax, fig), interval=50)
-    #rotation_animation.save('rotation_animation.gif', writer='imagemagick')  # Save the animation as a GIF file
+    rotation_animation.save('rotation_animation.gif', writer='imagemagick')  # Save the animation as a GIF file
+    plt.show()
+
+    fig = plt.figure(figsize=(7, 5))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.set_xlabel("PC1"), ax.set_ylabel("PC2"), ax.set_zlabel("Consumption")
+    ax.view_init(azim=60, elev=20)
+    ax.scatter(x_trans[:, 0], x_trans[:, 1], y_pred, c='r', label='Predicted')
+    ax.scatter(x_trans[:, 0], x_trans[:, 1], y.ravel(), c='b', label='Actual')
+    ax.legend()
+    plt.tight_layout()
     plt.show()
 
 
