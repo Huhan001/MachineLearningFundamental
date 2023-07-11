@@ -1,10 +1,9 @@
 from PCA import *
 from examplePCA import *
 def runchapter():
-    PrincipleComponentAnalysis()
-    #omptimalComponents()
-    #homework()
-    #heatmap()
+    #PrincipleComponentAnalysis()
+    #statisticalApproach()
+    heatmap()
 
 
 if __name__ == "__main__":
