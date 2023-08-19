@@ -8,12 +8,20 @@ class Item:
         assert price >= 0, f"price {price} is not greater than zero"
         assert quantity >= 0
 
-        self.name = name
-        self.price = price
-        self.quantity = quantity
+        self.__name = name
+        self.__price = price
+        self.__quantity = quantity
 
         # append to all
         Item.all.append(self)
+
+    @property
+    def quantity(self):
+       return self.__quantity
+
+    @property
+    def price(self):
+        return self.__price
 
     @property
     def name(self):
@@ -25,10 +33,10 @@ class Item:
 
     def calculate_total_price(self):
         # we do not need to have designated parameter
-        return  self.price * self.quantity
+        return  self.__price * self.__quantity
 
     def apply_discount(self):
-        return self.price * self.pay_rate
+        return self.__price * self.pay_rate
 
 
     # decorators are used to chaneg the behavior of a class method====================================
@@ -59,4 +67,4 @@ class Item:
 
 
     def __repr__(self):
-        return f"{self.__class__.__name__}('{self.name}', {self.price}, {self.quantity})"
+        return f"{self.__class__.__name__}('{self.name}', {self.__price}, {self.__quantity})"
